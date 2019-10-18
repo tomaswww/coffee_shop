@@ -8,6 +8,11 @@ venv
 env/
 venv/
 
+
+.mypy_cache
+.mypy_cache/
+mypy_cache/
+mypy_cache
 *~
 *.sw[mnpcod]
 *.log
