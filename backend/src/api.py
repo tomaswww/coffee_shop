@@ -27,16 +27,29 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    drinks = Drink.query.all().short()
+    return jsonify({
+        "success": True, "drinks": drinks
+        })
 
 
 '''
 @TODO implement endpoint
     GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
+        it should require the get:drinks-detail permission
         it should contain the drink.long() data representation
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks-detail', methods= ['GET'])
+@requires_auth('get:drinks-detail')
+def get_drinks_detail():
+    drinks = Drink.query.all().long()
+    return jsonify({
+        "success": True, "drinks": drinks
+    })
 
 
 '''
@@ -48,7 +61,23 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drink', methods=['POST'])
+@requires_auth('post:drinks')
+def get_drinks_detail():
+    data = request.get_json()
+    title = data.get('title')
+    recipe = data.get('recipe')
+    # Must find out how to store recipe correctly    
+    try:
+        drink = Drink(title=title, recipe=recipe)
+        drink.insert()
 
+        return jsonify({
+            "success": True, "drinks": drink
+        })
+    except Exception:
+        abort(422)
+    
 
 '''
 @TODO implement endpoint
@@ -71,8 +100,21 @@ CORS(app)
         it should delete the corresponding row for <id>
         it should require the 'delete:drinks' permission
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+        or appropriate status code indicating reason for failure --> DONE
 '''
+@app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(id):
+    try:
+        drink = Drink.query.filter_by(id=str(id)).one_or_none()
+        drink.delete()
+        return jsonify({
+            "success": True,
+            "delete": id
+        })
+    except Exception:
+        abort(404)
+
 
 
 ## Error Handling
@@ -94,13 +136,20 @@ def unprocessable(error):
                     "success": False, 
                     "error": 404,
                     "message": "resource not found"
-                    }), 404
+                    }), 404 --> DONE
 
 '''
+@app.errorhandler(404)
+def not_found(error):
+    jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
 
 '''
 @TODO implement error handler for 404
-    error handler should conform to general task above 
+    error handler should conform to general task above --> DONE SAME AS ABOVE
 '''
 
 
@@ -108,3 +157,19 @@ def unprocessable(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(400)
+def invalid_header(error):
+    jsonify({
+        "success": False,
+        'code': 'invalid_header',
+        "message": "Unable to find the appropriate key."
+    }), 400
+
+
+@app.errorhandler(401)
+def invalid_header(error):
+    jsonify({
+        "success": False,
+        'code': 'invalid_header',
+        "message": "Authorization malformed."
+    }), 401
