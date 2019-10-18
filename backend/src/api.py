@@ -12,11 +12,11 @@ setup_db(app)
 CORS(app)
 
 '''
-@TODO uncomment the following line to initialize the datbase
+@TODO uncomment the following line to initialize the datbase --> DONE
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -25,28 +25,30 @@ CORS(app)
         it should be a public endpoint
         it should contain only the drink.short() data representation
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+        or appropriate status code indicating reason for failure --> DONE
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    drinks = Drink.query.all().short()
+    drinks_query = Drink.query.all()
+    drinks= drinks_query.short()
     return jsonify({
         "success": True, "drinks": drinks
-        })
-
+    })
 
 '''
 @TODO implement endpoint
-    GET /drinks-detail
-        it should require the get:drinks-detail permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+GET /drinks-detail
+it should require the get:drinks-detail permission
+it should contain the drink.long() data representation
+returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+or appropriate status code indicating reason for failure
 '''
+
 @app.route('/drinks-detail', methods= ['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_detail():
-    drinks = Drink.query.all().long()
+    drinks_query = Drink.query.all().long()
+    drinks = drinks_query.long()
     return jsonify({
         "success": True, "drinks": drinks
     })
