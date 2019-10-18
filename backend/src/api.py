@@ -61,14 +61,14 @@ def get_drinks_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-@app.route('/drink', methods=['POST'])
+@app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def get_drinks_detail():
-    data = request.get_json()
-    title = data.get('title')
-    recipe = data.get('recipe')
+def create_drink():
     # Must find out how to store recipe correctly    
     try:
+        data = request.get_json()
+        title = data.get('title')
+        recipe = data.get('recipe')
         drink = Drink(title=title, recipe=recipe)
         drink.insert()
 
@@ -88,9 +88,22 @@ def get_drinks_detail():
         it should require the 'patch:drinks' permission
         it should contain the drink.long() data representation
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+        or appropriate status code indicating reason for failure --> DONE
 '''
-
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def patch_drink(id):
+    try:
+        data = request.get_json()
+        title = data.get('title')
+        recipe = data.get('recipe')
+        drink = Drink.query.filter_by(id=str(id)).first()
+        drink.update().values(title=title,recipe=recipe)
+        return jsonify({
+            "success": True, "drinks": drink
+        })
+    except Exception:
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -114,7 +127,6 @@ def delete_drink(id):
         })
     except Exception:
         abort(404)
-
 
 
 ## Error Handling
