@@ -49,7 +49,7 @@ or appropriate status code indicating reason for failure
 
 
 @app.route('/drinks-detail', methods=['GET'])
-@requires_auth('get:drinks-detail')
+#@requires_auth('get:drinks-detail')
 def get_drinks_detail():
     drinks_query = Drink.query.all().long()
     drinks = drinks_query.long()
@@ -69,7 +69,7 @@ def get_drinks_detail():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
-@requires_auth('post:drinks')
+#@requires_auth('post:drinks')
 def create_drink():
     # Must find out how to store recipe correctly
     try:
@@ -99,7 +99,7 @@ def create_drink():
         or appropriate status code indicating reason for failure --> DONE
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth('patch:drinks')
+#@requires_auth('patch:drinks')
 def patch_drink(id):
     try:
         data = request.get_json()
@@ -126,7 +126,7 @@ def patch_drink(id):
         or appropriate status code indicating reason for failure --> DONE
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
-@requires_auth('delete:drinks')
+#@requires_auth('delete:drinks')
 def delete_drink(id):
     try:
         drink = Drink.query.filter_by(id=str(id)).one_or_none()
