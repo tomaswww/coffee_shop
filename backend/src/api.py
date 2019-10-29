@@ -31,7 +31,9 @@ db_drop_and_create_all()
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
     drinks_query = Drink.query.all()
-    drinks = [drink.short() for drink in drinks]
+    drinks = [drink.short() for drink in drinks_query]
+    if not drinks:
+        abort(404)
     print(drinks_query)
     print(drinks)
     return "testing drinks public"
