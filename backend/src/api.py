@@ -30,7 +30,6 @@ db_drop_and_create_all()
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    print("inside")
     drinks_query = Drink.query.all()
     print(drinks_query)
     drinks = [drink.short() for drink in drinks_query]
@@ -77,7 +76,7 @@ def get_drinks_detail(self):
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink():
+def create_drink(self):
     # Must find out how to store recipe correctly
     try:
         data = request.get_json()
