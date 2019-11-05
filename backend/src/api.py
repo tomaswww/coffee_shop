@@ -170,7 +170,7 @@ def unprocessable(error):
 
 @app.errorhandler(404)
 def not_found(error):
-    jsonify({
+    return jsonify({
         "success": False,
         "error": 404,
         "message": "resource not found"
@@ -189,7 +189,7 @@ def not_found(error):
 '''
 @app.errorhandler(400)
 def invalid_header(error):
-    jsonify({
+    return jsonify({
         "success": False,
         'code': 'invalid_header',
         "message": "Unable to find the appropriate key."
@@ -198,7 +198,7 @@ def invalid_header(error):
 
 @app.errorhandler(401)
 def authorization_malformated(error):
-    jsonify({
+    return jsonify({
         "success": False,
         'code': 'authorization_malformated',
         "message": "Authorization malformed."
