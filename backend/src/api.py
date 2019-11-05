@@ -30,13 +30,16 @@ db_drop_and_create_all()
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
+    print("inside")
     drinks_query = Drink.query.all()
+    print(drinks_query)
     drinks = [drink.short() for drink in drinks_query]
+    print(drinks)
     if not drinks:
         abort(404)
-    print(drinks_query)
-    print(drinks)
-    return "testing drinks public"
+    return jsonify({
+        "success": True, "drinks": "drinks"
+    })
 
 
 '''
@@ -194,9 +197,9 @@ def invalid_header(error):
 
 
 @app.errorhandler(401)
-def invalid_header(error):
+def authorization_malformated(error):
     jsonify({
         "success": False,
-        'code': 'invalid_header',
+        'code': 'authorization_malformated',
         "message": "Authorization malformed."
     }), 401
