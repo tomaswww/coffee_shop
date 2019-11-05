@@ -1,5 +1,5 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -39,8 +39,9 @@ def get_token_auth_header():
         abort(401)
 
     auth_header = request.headers['Authorization']
-    header_parts = auth_header.split(' ')[1]
-
+    header_parts = auth_header.split(' ')
+    first_part = auth_header.split(' ')[0]
+    second_part = auth_header.split(' ')[1]
     if len(header_parts) != 2:
         abort(401)
     elif header_parts[0].lower() != 'bearer':
@@ -98,14 +99,12 @@ def check_permissions(permission, payload):
 
 
 def verify_decode_jwt(token):
-    def verify_decode_jwt(token):
         # GET THE PUBLIC KEY FROM AUTH0
         jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
         jwks = json.loads(jsonurl.read())
 
         # GET THE DATA IN THE HEADER
         unverified_header = jwt.get_unverified_header(token)
-
         # CHOOSE OUR KEY
         rsa_key = {}
         if 'kid' not in unverified_header:
@@ -128,13 +127,16 @@ def verify_decode_jwt(token):
         if rsa_key:
             try:
                 # USE THE KEY TO VALIDATE THE JWT
+                print("inside")
+                issuerString = str('https://'+AUTH0_DOMAIN+'/')
                 payload = jwt.decode(
                     token,
                     rsa_key,
                     algorithms=ALGORITHMS,
                     audience=API_AUDIENCE,
-                    issuer='https://' + AUTH0_DOMAIN + '/'
+                    issuer=issuerString
                 )
+                
 
                 return payload
 
@@ -180,6 +182,7 @@ def requires_auth(permission=''):
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
+            print(payload)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 

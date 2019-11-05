@@ -55,9 +55,9 @@ or appropriate status code indicating reason for failure
 
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+def get_drinks_detail(self):
     drinks_query = Drink.query.all()
-    drinks = [drink.long() for drink in drinks]
+    drinks = [drink.long() for drink in drinks_query]
     if not drinks:
         abort(404)
     return jsonify({
