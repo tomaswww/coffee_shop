@@ -125,25 +125,25 @@ def create_drink(payload):
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drink(payload,id):
-     data = request.get_json()
-     title = data.get('title')
-     recipe = data.get('recipe')
-     drink = Drink.query.get(id)
-     if not drink:
-         abort(404)
-     try:
-         if not recipe:
-                drink.update().values(title=title)
-         if not title:
-                drink.update().values(recipe=recipe)
-         else:
-                drink.update().values(title=title, recipe=recipe)
-     except SystemError:
+    # Get drink to PATCH
+    drink = Drink.query.get(id)
+    if not drink:
+        abort(404)
+    # Check what values are available to PATCH
+    data = request.get_json()
+    if 'title' in data:
+            drink.title = data.get('title')
+    if 'recipe' in data:
+            new_recipe = data.get('recipe')
+            drink.recipe = json.dumps(new_recipe)
+    try:
+        drink.update()
+    except SystemError:
          abort(500)
     
-     result = Drink.query.filter_by(id=drink.id)
-     drinks = [drink.long() for drink in result]
-     return jsonify({
+    result = Drink.query.filter_by(id=drink.id)
+    drinks = [drink.long() for drink in result]
+    return jsonify({
          "success": True, "drinks": drinks
      })
 
