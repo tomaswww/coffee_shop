@@ -5,7 +5,7 @@ import json
 from flask_cors import CORS
 
 
-from .database.models import db_drop_and_create_all,setup_db,Drink
+from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-#db_drop_and_create_all()
+# db_drop_and_create_all()
 
 
 # ROUTES
@@ -79,35 +79,34 @@ def get_drinks_detail(self):
 @requires_auth(permission='post:drinks')
 def create_drink(payload):
     # Must find out how to store recipe correctly
-        data = request.get_json()
-        if not data:
-            abort(400)
+    data = request.get_json()
+    if not data:
+        abort(400)
 
-        new_title = data.get('title')
-        new_recipe= data.get('recipe')
+    new_title = data.get('title')
+    new_recipe = data.get('recipe')
 
-        if not new_title or not new_recipe:
-            abort(400)
+    if not new_title or not new_recipe:
+        abort(400)
 
-        # Creating the drink
-        new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
-        try:
-            new_drink.insert()
-        except Exception:
-            abort(401)
+    # Creating the drink
+    new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
+    try:
+        new_drink.insert()
+    except Exception:
+        abort(401)
 
-        # Query for drinks and getting the newly created
-        new_drinks = Drink.query.all()
-        # Formating response
-        drinks = [drink.long()
-                  for drink in new_drinks if drink.id == new_drink.id]
-        if not drinks:
-            abort(404)
+    # Query for drinks and getting the newly created
+    new_drinks = Drink.query.all()
+    # Formating response
+    drinks = [drink.long()
+              for drink in new_drinks if drink.id == new_drink.id]
+    if not drinks:
+        abort(404)
 
-        return jsonify({
-            "success": True, "drinks": drinks
-        })
-    
+    return jsonify({
+        "success": True, "drinks": drinks
+    })
 
 
 '''
@@ -124,7 +123,7 @@ def create_drink(payload):
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth(permission='patch:drinks')
-def patch_drink(payload,id):
+def patch_drink(payload, id):
     # Get drink to PATCH
     drink = Drink.query.get(id)
     if not drink:
@@ -132,21 +131,20 @@ def patch_drink(payload,id):
     # Check what values are available to PATCH
     data = request.get_json()
     if 'title' in data:
-            drink.title = data.get('title')
+        drink.title = data.get('title')
     if 'recipe' in data:
-            new_recipe = data.get('recipe')
-            drink.recipe = json.dumps(new_recipe)
+        new_recipe = data.get('recipe')
+        drink.recipe = json.dumps(new_recipe)
     try:
         drink.update()
     except Exception:
-         abort(401)
-    
+        abort(401)
+
     result = Drink.query.filter_by(id=drink.id)
     drinks = [drink.long() for drink in result]
     return jsonify({
          "success": True, "drinks": drinks
      })
-
 
 
 '''
@@ -162,7 +160,7 @@ def patch_drink(payload,id):
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth(permission='delete:drinks')
-def delete_drink(payload,id):
+def delete_drink(payload, id):
     drink = Drink.query.get(id)
     if not drink:
         abort(404)
@@ -171,8 +169,8 @@ def delete_drink(payload,id):
     except Exception:
         abort(401)
     return jsonify({
-          "success": True,
-            "delete": id
+        "success": True,
+        "delete": id
     })
 
 
