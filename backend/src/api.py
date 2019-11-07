@@ -76,7 +76,7 @@ def get_drinks_detail(self):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
-@requires_auth('post:drinks')
+@requires_auth(permission='post:drinks')
 def create_drink(payload):
     # Must find out how to store recipe correctly
         data = request.get_json()
@@ -93,7 +93,7 @@ def create_drink(payload):
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
         try:
             new_drink.insert()
-        except SystemError:
+        except Exception:
             abort(401)
 
         # Query for drinks and getting the newly created
@@ -123,7 +123,7 @@ def create_drink(payload):
         or appropriate status code indicating reason for failure --> DONE
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-@requires_auth('patch:drinks')
+@requires_auth(permission='patch:drinks')
 def patch_drink(payload,id):
     # Get drink to PATCH
     drink = Drink.query.get(id)
@@ -138,8 +138,8 @@ def patch_drink(payload,id):
             drink.recipe = json.dumps(new_recipe)
     try:
         drink.update()
-    except SystemError:
-         abort(500)
+    except Exception:
+         abort(401)
     
     result = Drink.query.filter_by(id=drink.id)
     drinks = [drink.long() for drink in result]
@@ -161,15 +161,15 @@ def patch_drink(payload,id):
         or appropriate status code indicating reason for failure --> DONE
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
-@requires_auth('delete:drinks')
+@requires_auth(permission='delete:drinks')
 def delete_drink(payload,id):
     drink = Drink.query.get(id)
     if not drink:
         abort(404)
     try:
         drink.delete()
-    except SystemError:
-        abort(500)
+    except Exception:
+        abort(401)
     return jsonify({
           "success": True,
             "delete": id
