@@ -100,7 +100,7 @@ def create_drink(payload):
         new_drinks = Drink.query.all()
         # Formating response
         drinks = [drink.long()
-                  for drink in snew_drinks if drink.id == new_drink.id]
+                  for drink in new_drinks if drink.id == new_drink.id]
         if not drinks:
             abort(404)
 
