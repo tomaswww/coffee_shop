@@ -35,7 +35,6 @@ def get_drinks():
     drinks_query = Drink.query.all()
     print(drinks_query)
     drinks = [drink.short() for drink in drinks_query]
-    print(drinks)
     if not drinks:
         abort(404)
     return jsonify({
@@ -62,7 +61,7 @@ def get_drinks_detail(self):
     if not drinks:
         abort(404)
     return jsonify({
-        "success": True, "drinks": "drinks"
+        "success": True, "drinks": drinks
     })
 
 
@@ -78,20 +77,37 @@ def get_drinks_detail(self):
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink(self):
+def create_drink(payload):
     # Must find out how to store recipe correctly
-    try:
         data = request.get_json()
-        title = data.get('title')
-        recipe = data.get('recipe')
-        drink = Drink(title=title, recipe=recipe)
-        drink.insert()
+        if not data:
+            abort(400)
+        print(data)
+        new_title = data.get('title')
+        new_title2 = data['title']
+        print(new_title)
+        new_recipe= data.get('recipe')
+        print(new_recipe)
+
+        if not new_title or not new_recipe:
+            abort(400)
+        
+        new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
+        try:
+            new_drink.insert()
+        except SystemError:
+            abort(500)
+        selection = Drink.query.all()
+
+        drinks = [drink.long()
+                  for drink in selection if drink.id == new_drink.id]
+        if not drinks:
+            abort(404)
 
         return jsonify({
-            "success": True, "drinks": drink
+            "success": True, "drinks": drinks
         })
-    except Exception:
-        abort(422)
+    
 
 
 '''
@@ -108,18 +124,29 @@ def create_drink(self):
 '''
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def patch_drink(id):
-    try:
-        data = request.get_json()
-        title = data.get('title')
-        recipe = data.get('recipe')
-        drink = Drink.query.filter_by(id=str(id)).first()
-        drink.update().values(title=title, recipe=recipe)
-        return jsonify({
-            "success": True, "drinks": drink
-        })
-    except Exception:
-        abort(422)
+def patch_drink(payload,id):
+     data = request.get_json()
+     title = data.get('title')
+     recipe = data.get('recipe')
+     drink = Drink.query.get(id)
+     if not drink:
+         abort(404)
+     try:
+         if not recipe:
+                drink.update().values(title=title)
+         if not title:
+                drink.update().values(recipe=recipe)
+         else:
+                drink.update().values(title=title, recipe=recipe)
+     except SystemError:
+         abort(500)
+    
+     result = Drink.query.filter_by(id=drink.id)
+     drinks = [drink.long() for drink in result]
+     return jsonify({
+         "success": True, "drinks": drinks
+     })
+
 
 
 '''
@@ -135,16 +162,18 @@ def patch_drink(id):
 '''
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(id):
-    try:
-        drink = Drink.query.filter_by(id=str(id)).one_or_none()
-        drink.delete()
-        return jsonify({
-            "success": True,
-            "delete": id
-        })
-    except Exception:
+def delete_drink(payload,id):
+    drink = Drink.query.get(id)
+    if not drink:
         abort(404)
+    try:
+        drink.delete()
+    except SystemError:
+        abort(500)
+    return jsonify({
+          "success": True,
+            "delete": id
+    })
 
 
 # Error Handling

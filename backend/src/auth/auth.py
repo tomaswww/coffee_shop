@@ -124,7 +124,6 @@ def verify_decode_jwt(token):
     if rsa_key:
         try:
             # USE THE KEY TO VALIDATE THE JWT
-            print("inside")
             issuerString = str('https://'+AUTH0_DOMAIN+'/')
             payload = jwt.decode(
                 token,
@@ -175,7 +174,6 @@ def requires_auth(permission=''):
         def wrapper(*args, **kwargs):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
-            print(payload)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
