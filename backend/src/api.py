@@ -82,25 +82,25 @@ def create_drink(payload):
         data = request.get_json()
         if not data:
             abort(400)
-        print(data)
+
         new_title = data.get('title')
-        new_title2 = data['title']
-        print(new_title)
         new_recipe= data.get('recipe')
-        print(new_recipe)
 
         if not new_title or not new_recipe:
             abort(400)
-        
+
+        # Creating the drink
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
         try:
             new_drink.insert()
         except SystemError:
             abort(500)
-        selection = Drink.query.all()
 
+        # Query for drinks and getting the newly created
+        new_drinks = Drink.query.all()
+        # Formating response
         drinks = [drink.long()
-                  for drink in selection if drink.id == new_drink.id]
+                  for drink in snew_drinks if drink.id == new_drink.id]
         if not drinks:
             abort(404)
 
