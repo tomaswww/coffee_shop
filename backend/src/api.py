@@ -4,7 +4,8 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+
+from .database.models import db_drop_and_create_all,setup_db,Drink
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
 db_drop_and_create_all()
+
 
 # ROUTES
 '''
@@ -37,7 +39,7 @@ def get_drinks():
     if not drinks:
         abort(404)
     return jsonify({
-        "success": True, "drinks": "drinks"
+        "success": True, "drinks": drinks
     })
 
 
