@@ -94,7 +94,7 @@ def create_drink(payload):
         try:
             new_drink.insert()
         except SystemError:
-            abort(500)
+            abort(401)
 
         # Query for drinks and getting the newly created
         new_drinks = Drink.query.all()
