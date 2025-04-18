@@ -12,6 +12,7 @@ You have been called on to demonstrate your newly learned skills to create a ful
 4) Allow the shop managers to create new drinks and edit existing drinks.
 
 ## Tasks
+test
 
 There are `@TODO` comments throughout project. We recommend tackling the sections in order. Start by reading the READMEs in:
 

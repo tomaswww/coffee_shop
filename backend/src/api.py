@@ -58,6 +58,7 @@ or appropriate status code indicating reason for failure
 def get_drinks_detail(self):
     drinks_query = Drink.query.all()
     drinks = [drink.long() for drink in drinks_query]
+    print("hello this should not be here")
     if not drinks:
         abort(404)
     return jsonify({
